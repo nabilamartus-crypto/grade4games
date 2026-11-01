@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Class 4 in Spelling Games!</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka & Nunito -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            purple: '#6C5CE7',
+                            pink: '#FD79A8',
+                            yellow: '#FDCB6E',
+                            blue: '#74B9FF',
+                            green: '#55E6C1',
+                            orange: '#E17055',
+                            dark: '#2D3436'
+                        }
+                    },
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        nunito: ['Nunito', 'sans-serif']
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-short': 'bounce 0.6s ease-in-out 2',
+                        'float': 'float 3s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        .heading-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .mic-active {
+            animation: micGlow 1.2s infinite alternate;
+            background: linear-gradient(135deg, #ff4757, #ff6b81) !important;
+            box-shadow: 0 0 25px rgba(255, 71, 87, 0.8), 0 0 50px rgba(255, 107, 129, 0.4) !important;
+        }
+
+        @keyframes micGlow {
+            0% { transform: scale(1); box-shadow: 0 0 15px rgba(255, 71, 87, 0.6); }
+            100% { transform: scale(1.08); box-shadow: 0 0 35px rgba(255, 71, 87, 1); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            border: 4px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25), inset 0 2px 4px rgba(255,255,255,0.9);
+        }
+
+        .btn-pop {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer !important;
+            pointer-events: auto !important;
+        }
+        .btn-pop:hover {
+            transform: translateY(-4px) scale(1.02);
+        }
+        .btn-pop:active {
+            transform: translateY(2px) scale(0.98);
+        }
+
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .wave-bar {
+            animation: wave 1s ease-in-out infinite alternate;
+        }
+        .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.6s; }
+        @keyframes wave {
+            0% { height: 8px; }
+            100% { height: 28px; }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-2 sm:p-4 text-brand-dark overflow-x-hidden min-h-screen">
+
+    <!-- Confetti Canvas Overlay -->
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- Main Game Container -->
+    <div class="w-full max-w-4xl min-h-[650px] flex flex-col justify-between glass-card rounded-3xl p-4 sm:p-6 relative overflow-hidden my-auto shadow-2xl">
+        
+        <!-- TOP HEADER: Score, Progress, Audio & Mode Navigation -->
+        <header id="mainHeader" class="w-full mb-3">
+            <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
+                <!-- App Title / Menu Button -->
+                <div class="flex items-center space-x-2">
+                    <button id="homeMenuBtn" onclick="window.resetToMainMenu()" title="Back to Main Menu" class="btn-pop bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-3 py-1.5 rounded-2xl flex items-center space-x-1.5 font-extrabold text-xs">
+                        <i class="fa-solid fa-house text-sm"></i>
+                        <span>Menu</span>
+                    </button>
+                    <div>
+                        <h1 class="heading-font text-lg sm:text-2xl font-extrabold text-brand-purple tracking-wide leading-none">
+                            Class 4 Spelling
+                        </h1>
+                        <p class="text-[10px] sm:text-xs font-extrabold text-gray-500 uppercase tracking-wider">Days & Subjects</p>
+                    </div>
+                </div>
+
+                <!-- Phase Badge Indicator -->
+                <div id="phaseBadge" class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-3.5 py-1 rounded-full font-bold text-xs shadow-md flex items-center space-x-1.5">
+                    <i class="fa-solid fa-star-sharp text-yellow-300"></i>
+                    <span id="phaseBadgeText">Phase 1: Word Flashcards</span>
+                </div>
+
+                <!-- Stats: Stars, Score, Sound -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <div class="bg-yellow-100 border-2 border-yellow-400 px-2.5 py-0.5 rounded-2xl flex items-center space-x-1 text-yellow-700 font-extrabold text-xs sm:text-sm">
+                        <i class="fa-solid fa-star text-yellow-500 text-sm"></i>
+                        <span id="starCounter">0</span>
+                    </div>
+
+                    <div class="bg-blue-100 border-2 border-blue-400 px-2.5 py-0.5 rounded-2xl flex items-center space-x-1 text-blue-700 font-extrabold text-xs sm:text-sm">
+                        <i class="fa-solid fa-trophy text-blue-500 text-xs"></i>
+                        <span id="scoreCounter">0</span>
+                    </div>
+
+                    <button id="soundToggleBtn" onclick="window.toggleSound()" class="btn-pop w-9 h-9 rounded-2xl bg-gray-100 border-2 border-gray-300 text-gray-600 hover:bg-gray-200 flex items-center justify-center transition">
+                        <i class="fa-solid fa-volume-high text-sm" id="soundIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 h-3.5 rounded-full overflow-hidden p-0.5 border border-gray-300 shadow-inner">
+                <div id="progressBar" class="bg-gradient-to-r from-green-400 to-emerald-500 h-full rounded-full transition-all duration-500 w-0"></div>
+            </div>
+            <div class="flex justify-between items-center text-[11px] text-gray-500 font-bold mt-1 px-1">
+                <span id="progressText">Question 1 of 16</span>
+                <span id="categoryTag" class="bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-full uppercase text-[9px] tracking-wider">Days of the week</span>
+            </div>
+        </header>
+
+        <!-- MAIN GAMEPLAY & MENU AREA -->
+        <main class="flex-grow flex flex-col justify-center items-center py-2 relative w-full">
+
+            <!-- WELCOME & MAIN MENU OVERLAY (Fully Clickable) -->
+            <div id="welcomeScreen" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/95 backdrop-blur-md rounded-2xl p-4 sm:p-6 text-center overflow-y-auto">
+                <div class="text-5xl sm:text-6xl mb-2 animate-float">🏫 🎙️ ✨</div>
+                <h2 class="heading-font text-2xl sm:text-4xl font-extrabold text-brand-purple mb-1">
+                    Welcome Class 4 in Spelling Games!
+                </h2>
+                <p class="text-gray-600 max-w-lg text-xs sm:text-sm mb-4 font-semibold">
+                    Master your English Days & School Subjects vocabulary through pronunciation, letter-by-letter spelling, and visual clues!
+                </p>
+
+                <!-- Phase Selection Buttons Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-2xl mb-4">
+                    <button id="btnSelectPhase1" onclick="window.startSpecificPhase(1, 'single')" class="btn-pop bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white p-4 rounded-2xl shadow-lg border-2 border-indigo-300 text-left flex flex-col justify-between cursor-pointer">
+                        <div>
+                            <span class="text-3xl mb-1 block">📢</span>
+                            <h3 class="heading-font text-lg font-bold">Phase 1</h3>
+                            <p class="text-xs text-indigo-100 leading-snug">Word Pronunciation Flashcards</p>
+                        </div>
+                        <span class="mt-3 text-[10px] bg-white/25 px-2.5 py-1 rounded-full font-extrabold uppercase w-fit tracking-wider">SPEAK WORDS</span>
+                    </button>
+
+                    <button id="btnSelectPhase2" onclick="window.startSpecificPhase(2, 'single')" class="btn-pop bg-gradient-to-br from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white p-4 rounded-2xl shadow-lg border-2 border-pink-300 text-left flex flex-col justify-between cursor-pointer">
+                        <div>
+                            <span class="text-3xl mb-1 block">🔤</span>
+                            <h3 class="heading-font text-lg font-bold">Phase 2</h3>
+                            <p class="text-xs text-pink-100 leading-snug">Spelling Per Huruf + Logo View</p>
+                        </div>
+                        <span class="mt-3 text-[10px] bg-white/25 px-2.5 py-1 rounded-full font-extrabold uppercase w-fit tracking-wider">LETTER BY LETTER</span>
+                    </button>
+
+                    <button id="btnSelectPhase3" onclick="window.startSpecificPhase(3, 'single')" class="btn-pop bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white p-4 rounded-2xl shadow-lg border-2 border-amber-300 text-left flex flex-col justify-between cursor-pointer">
+                        <div>
+                            <span class="text-3xl mb-1 block">🎯</span>
+                            <h3 class="heading-font text-lg font-bold">Phase 3</h3>
+                            <p class="text-xs text-amber-100 leading-snug">Subject Logos & Days Clues</p>
+                        </div>
+                        <span class="mt-3 text-[10px] bg-white/25 px-2.5 py-1 rounded-full font-extrabold uppercase w-fit tracking-wider">CLUES & LOGOS</span>
+                    </button>
+                </div>
+
+                <!-- Play Full Game Button -->
+                <button id="btnPlayFullGame" onclick="window.startSpecificPhase(1, 'full')" class="btn-pop bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-base sm:text-lg font-extrabold px-8 py-3.5 rounded-2xl shadow-xl flex items-center space-x-3 cursor-pointer">
+                    <i class="fa-solid fa-circle-play text-2xl"></i>
+                    <span>PLAY ALL PHASES (FULL GAME)</span>
+                </button>
+            </div>
+
+            <!-- PHASE COMPLETION TRANSITION MODAL -->
+            <div id="phaseModal" class="hidden absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/95 backdrop-blur-md rounded-2xl p-6 text-center">
+                <div class="text-6xl mb-2">🎉</div>
+                <h3 class="heading-font text-2xl sm:text-3xl font-extrabold text-brand-purple mb-1">Phase Completed!</h3>
+                <p id="phaseModalText" class="text-gray-600 max-w-md text-sm sm:text-base mb-6 font-semibold">
+                    Awesome effort, Class 4! Get ready for the next challenge!
+                </p>
+                <div class="flex space-x-3">
+                    <button id="phaseModalMenuBtn" onclick="window.resetToMainMenu()" class="btn-pop bg-gray-200 hover:bg-gray-300 text-gray-700 font-extrabold px-5 py-3 rounded-2xl text-sm">
+                        Main Menu
+                    </button>
+                    <button id="nextPhaseBtn" onclick="window.nextPhaseFromModal()" class="btn-pop bg-gradient-to-r from-emerald-400 to-teal-500 text-white text-base font-extrabold px-6 py-3 rounded-2xl shadow-lg flex items-center space-x-2">
+                        <span>CONTINUE</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- GAME OVER / RESULTS OVERLAY -->
+            <div id="gameOverScreen" class="hidden absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/95 backdrop-blur-md rounded-2xl p-6 text-center">
+                <div id="resultBadge" class="text-6xl mb-2">🏆</div>
+                <h2 class="heading-font text-3xl sm:text-4xl font-extrabold text-brand-purple mb-1">Class 4 Victory!</h2>
+                <p id="resultSubtitle" class="text-gray-600 font-semibold mb-3 text-sm sm:text-base">You mastered all Days and Subjects spelling!</p>
+
+                <!-- Stars Rating -->
+                <div class="flex justify-center space-x-3 text-4xl sm:text-5xl my-2" id="starsContainer">
+                    <i class="fa-solid fa-star text-yellow-400 animate-bounce"></i>
+                    <i class="fa-solid fa-star text-yellow-400 animate-bounce" style="animation-delay: 0.15s"></i>
+                    <i class="fa-solid fa-star text-yellow-400 animate-bounce" style="animation-delay: 0.3s"></i>
+                </div>
+
+                <div class="bg-gray-50 border-2 border-gray-200 rounded-2xl p-4 my-3 w-full max-w-xs space-y-1.5 text-xs sm:text-sm font-bold">
+                    <div class="flex justify-between text-gray-600">
+                        <span>Total Score:</span>
+                        <span id="finalScoreText" class="text-brand-purple font-extrabold text-base">0 pts</span>
+                    </div>
+                    <div class="flex justify-between text-gray-600">
+                        <span>Correct Answers:</span>
+                        <span id="finalAccuracyText" class="text-emerald-600 font-extrabold text-base">0/16</span>
+                    </div>
+                    <div class="flex justify-between text-gray-600">
+                        <span>Stars Earned:</span>
+                        <span id="finalStarsText" class="text-yellow-600 font-extrabold text-base">0 Stars</span>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3 mt-2">
+                    <button id="endMenuBtn" onclick="window.resetToMainMenu()" class="btn-pop bg-gray-200 hover:bg-gray-300 text-gray-700 font-extrabold px-5 py-3 rounded-2xl text-sm">
+                        Main Menu
+                    </button>
+                    <button id="restartGameBtn" onclick="window.startSpecificPhase(1, 'full')" class="btn-pop bg-gradient-to-r from-brand-purple to-indigo-600 text-white text-base font-extrabold px-6 py-3 rounded-2xl shadow-xl flex items-center space-x-2">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>PLAY AGAIN</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CARD DISPLAY AREA -->
+            <div class="w-full max-w-xl bg-gradient-to-b from-white to-blue-50/60 rounded-3xl p-4 sm:p-5 border-2 border-blue-100 shadow-md flex flex-col items-center text-center relative mb-3">
+
+                <!-- PHASE 1 CARD: Word Pronunciation Flashcard -->
+                <div id="phase1Card" class="w-full flex flex-col items-center">
+                    <div id="p1Emoji" onclick="window.speakTargetWord()" class="text-6xl sm:text-7xl mb-1 filter drop-shadow-md transition-transform duration-300 hover:scale-110 cursor-pointer">
+                        📐
+                    </div>
+                    
+                    <div class="flex items-center justify-center space-x-3 my-1">
+                        <h2 id="p1TargetWord" class="heading-font text-3xl sm:text-4xl font-extrabold text-brand-dark tracking-wide">
+                            Math
+                        </h2>
+                        <button id="p1SpeakBtn" onclick="window.speakTargetWord()" title="Listen to Pronunciation" class="btn-pop w-10 h-10 rounded-2xl bg-indigo-50 border-2 border-indigo-200 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center shadow-sm">
+                            <i class="fa-solid fa-volume-high text-lg"></i>
+                        </button>
+                    </div>
+
+                    <p id="p1Phonetic" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-0.5 rounded-full border border-indigo-100">
+                        Phonics: MATH
+                    </p>
+                </div>
+
+                <!-- PHASE 2 CARD: Spelling Per Huruf + Prominent Logo Display -->
+                <div id="phase2Card" class="hidden w-full flex flex-col items-center">
+                    <div class="bg-pink-100 border border-pink-200 text-pink-700 text-[11px] font-bold px-3 py-0.5 rounded-full mb-2 flex items-center space-x-1">
+                        <i class="fa-solid fa-font text-pink-500"></i>
+                        <span>SPELL LETTER BY LETTER</span>
+                    </div>
+
+                    <!-- Prominent Subject/Day Logo -->
+                    <div class="bg-white border-2 border-pink-200 rounded-2xl p-3 shadow-inner mb-3 flex items-center justify-center space-x-3 w-full max-w-xs cursor-pointer" onclick="window.speakTargetWord()">
+                        <span id="p2Logo" class="text-5xl sm:text-6xl filter drop-shadow">🎨</span>
+                        <div class="text-left">
+                            <span class="text-[10px] uppercase font-bold text-gray-400 block tracking-wider">Vocabulary Item</span>
+                            <span id="p2VocabName" class="heading-font text-lg font-bold text-pink-600">Arts</span>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Letter Slots -->
+                    <div id="letterSlotsContainer" class="flex flex-wrap justify-center gap-1.5 sm:gap-2 my-1 max-w-md">
+                        <!-- Slots dynamically rendered -->
+                    </div>
+
+                    <!-- Letter Progress Counter -->
+                    <div id="p2LetterProgress" class="text-xs font-extrabold text-pink-600 bg-pink-50 px-3 py-1 rounded-full border border-pink-200 mt-1">
+                        Spelling Progress: 0 / 4 letters
+                    </div>
+
+                    <p class="text-[11px] font-extrabold text-gray-400 mt-2">
+                        Spell letters out loud (e.g., "M - A - T - H") or say full word!
+                    </p>
+                </div>
+
+                <!-- PHASE 3 CARD: Subject Logos (No Text) OR Days Clues -->
+                <div id="phase3Card" class="hidden w-full flex flex-col items-center">
+                    
+                    <!-- Subject Mode (ONLY Logo Shown) -->
+                    <div id="p3SubjectView" class="hidden flex flex-col items-center">
+                        <div class="bg-amber-100 border border-amber-200 text-amber-800 text-[11px] font-bold px-3 py-0.5 rounded-full mb-2 flex items-center space-x-1">
+                            <i class="fa-solid fa-icons text-amber-600"></i>
+                            <span>WHAT SUBJECT IS THIS LOGO?</span>
+                        </div>
+                        <div id="p3SubjectLogo" class="text-7xl sm:text-8xl my-3 filter drop-shadow-lg animate-float">
+                            🎨
+                        </div>
+                        <p class="heading-font text-xl font-bold text-gray-700">Name this subject in English!</p>
+                    </div>
+
+                    <!-- Days Mode (Clues using yesterday/today/tomorrow/after/before) -->
+                    <div id="p3DaysView" class="hidden flex flex-col items-center">
+                        <div class="bg-blue-100 border border-blue-200 text-blue-800 text-[11px] font-bold px-3 py-0.5 rounded-full mb-2 flex items-center space-x-1">
+                            <i class="fa-solid fa-calendar-day text-blue-600"></i>
+                            <span>DAYS LOGIC CLUE</span>
+                        </div>
+                        <div id="p3DayEmoji" class="text-5xl mb-1">📅</div>
+                        <p id="p3DayClueText" class="heading-font text-lg sm:text-2xl font-bold text-gray-800 leading-snug px-2 my-2">
+                            "If today is Tuesday, tomorrow is ________."
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Helper Hint Drawer -->
+                <div class="mt-2 flex items-center space-x-2">
+                    <button id="getHintBtn" onclick="window.showHint()" class="btn-pop text-[11px] font-extrabold text-brand-purple hover:underline flex items-center space-x-1 bg-white px-3 py-1 rounded-full border border-purple-200 shadow-sm">
+                        <i class="fa-regular fa-lightbulb text-yellow-500"></i>
+                        <span>Need a hint?</span>
+                    </button>
+                    <button id="listenTTSBtn" onclick="window.speakTargetWord()" class="btn-pop text-[11px] font-extrabold text-indigo-600 hover:underline flex items-center space-x-1 bg-white px-3 py-1 rounded-full border border-indigo-200 shadow-sm">
+                        <i class="fa-solid fa-volume-high text-indigo-500"></i>
+                        <span>Listen Audio</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- INTERACTION ZONE: Microphone / Voice Feedback / Text Input -->
+            <div class="w-full max-w-xl flex flex-col items-center">
+                
+                <!-- Feedback Toast -->
+                <div id="feedbackToast" class="opacity-0 transition-opacity duration-300 mb-2 px-4 py-1 rounded-2xl text-xs sm:text-sm font-extrabold flex items-center space-x-2 shadow-sm">
+                    <span id="feedbackIcon">✨</span>
+                    <span id="feedbackText">Great pronunciation!</span>
+                </div>
+
+                <!-- Voice Mic Controls -->
+                <div id="voiceControlArea" class="flex flex-col items-center space-y-2 w-full">
+                    <div class="relative flex items-center justify-center">
+                        <div id="micRipple" class="hidden absolute w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-red-400 opacity-40 animate-ping"></div>
+                        
+                        <button id="micBtn" onclick="window.toggleVoiceRecognition()" class="btn-pop relative z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-brand-pink to-red-500 text-white shadow-xl flex flex-col items-center justify-center border-4 border-white transition cursor-pointer">
+                            <i id="micIcon" class="fa-solid fa-microphone text-2xl sm:text-3xl mb-0.5"></i>
+                            <span id="micLabel" class="text-[9px] font-extrabold tracking-wider uppercase">TAP TO SPEAK</span>
+                        </button>
+                    </div>
+
+                    <!-- Voice Wave Visualizer -->
+                    <div id="voiceWave" class="hidden flex items-center justify-center space-x-1.5 h-6">
+                        <span class="wave-bar w-1.5 bg-red-500 rounded-full"></span>
+                        <span class="wave-bar w-1.5 bg-red-500 rounded-full"></span>
+                        <span class="wave-bar w-1.5 bg-red-500 rounded-full"></span>
+                        <span class="wave-bar w-1.5 bg-red-500 rounded-full"></span>
+                        <span class="text-xs font-bold text-red-500 ml-2 animate-pulse">Listening... Speak now!</span>
+                    </div>
+
+                    <!-- Live Voice Transcript display -->
+                    <div id="transcriptBox" class="w-full bg-white/80 border border-gray-200 rounded-2xl p-2 min-h-[40px] flex items-center justify-center text-xs sm:text-sm font-bold text-gray-700 shadow-inner">
+                        <span id="transcriptText" class="text-gray-400 italic">Your spoken answer will appear here...</span>
+                    </div>
+                </div>
+
+                <!-- Fallback Text Input Mode Container -->
+                <div id="textInputArea" class="hidden w-full flex flex-col items-center space-y-2">
+                    <div class="flex w-full max-w-md space-x-2">
+                        <input type="text" id="keyboardAnswerInput" placeholder="Type answer or spelled letters..." class="flex-grow px-4 py-2.5 rounded-2xl border-2 border-indigo-200 focus:border-brand-purple focus:outline-none font-bold text-sm sm:text-base shadow-inner">
+                        <button id="submitTextAnswerBtn" onclick="window.submitKeyboardAnswer()" class="btn-pop bg-brand-purple text-white px-5 py-2.5 rounded-2xl font-extrabold flex items-center space-x-1 shadow-md text-sm">
+                            <span>Submit</span>
+                            <i class="fa-solid fa-paper-plane text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Switch Input Mode Link -->
+                <div class="mt-2 flex items-center space-x-4 text-xs font-bold">
+                    <button id="toggleInputModeBtn" onclick="window.switchToKeyboardMode()" class="btn-pop text-indigo-600 hover:text-indigo-800 underline flex items-center space-x-1">
+                        <i class="fa-solid fa-keyboard"></i>
+                        <span id="toggleInputText">Can't use mic? Switch to Typing Mode</span>
+                    </button>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- FOOTER / HELP BAR -->
+        <footer class="w-full pt-2 border-t border-gray-200/80 flex justify-between items-center text-[11px] font-bold text-gray-500">
+            <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="speechStatusText">Speech Engine Ready 🎙️</span>
+            </div>
+            <button id="skipQuestionBtn" onclick="window.skipQuestion()" class="btn-pop text-gray-400 hover:text-gray-600 flex items-center space-x-1">
+                <span>Skip</span>
+                <i class="fa-solid fa-forward text-[9px]"></i>
+            </button>
+        </footer>
+
+    </div>
+
+    <!-- COMPLETE GAME JAVASCRIPT ENGINE -->
+    <script>
+        /* ==========================================================================
+           16 STRICT TARGET VOCABULARIES DATA & PHASES
+           ========================================================================== */
+
+        const VOCAB_DATABASE = {
+            // Subjects (9)
+            "math": { word: "Math", category: "Subject", logo: "📐", phonetic: "MATH", hint: "Numbers and counting subject." },
+            "indonesian": { word: "Indonesian", category: "Subject", logo: "🇮🇩", phonetic: "in-do-NE-sian", hint: "Our national language subject." },
+            "english": { word: "English", category: "Subject", logo: "🇬🇧", phonetic: "ING-glish", hint: "Language subject we are practicing right now." },
+            "civics": { word: "Civics", category: "Subject", logo: "🏛️", phonetic: "SI-viks", hint: "Pancasila and citizenship subject." },
+            "science": { word: "Science", category: "Subject", logo: "🧪", phonetic: "SY-enss", hint: "Experiments and nature subject." },
+            "social studies": { word: "Social Studies", category: "Subject", logo: "🌍", phonetic: "SO-shal STU-dees", hint: "History, geography, and society subject." },
+            "religion": { word: "Religion", category: "Subject", logo: "🙏", phonetic: "re-LI-jun", hint: "Moral and religious values subject." },
+            "physical education": { word: "Physical Education", category: "Subject", logo: "⚽", phonetic: "PE / Sports", hint: "Sports, fitness, and movement subject." },
+            "arts": { word: "Arts", category: "Subject", logo: "🎨", phonetic: "ARTZ", hint: "Drawing, painting, and crafting subject." },
+
+            // Days of the Week (7)
+            "monday": { word: "Monday", category: "Day", logo: "📅", phonetic: "MON-day", hint: "The first day of the school week." },
+            "tuesday": { word: "Tuesday", category: "Day", logo: "🗓️", phonetic: "TOOZ-day", hint: "The day after Monday." },
+            "wednesday": { word: "Wednesday", category: "Day", logo: "📆", phonetic: "WENZ-day", hint: "The middle day of the school week." },
+            "thursday": { word: "Thursday", category: "Day", logo: "📋", phonetic: "THURZ-day", hint: "The day after Wednesday." },
+            "friday": { word: "Friday", category: "Day", logo: "🥳", phonetic: "FRY-day", hint: "The last day of the school week." },
+            "saturday": { word: "Saturday", category: "Day", logo: "🎒", phonetic: "SA-tur-day", hint: "The first day of the weekend." },
+            "sunday": { word: "Sunday", category: "Day", logo: "☀️", phonetic: "SUN-day", hint: "The weekend day right before Monday." }
+        };
+
+        const PHASE_3_QUESTIONS = [
+            // Subject Logo Questions (NO Text Descriptions!)
+            { key: "arts", type: "subject_logo" },
+            { key: "math", type: "subject_logo" },
+            { key: "science", type: "subject_logo" },
+            { key: "indonesian", type: "subject_logo" },
+            { key: "english", type: "subject_logo" },
+            { key: "civics", type: "subject_logo" },
+            { key: "social studies", type: "subject_logo" },
+            { key: "religion", type: "subject_logo" },
+            { key: "physical education", type: "subject_logo" },
+
+            // Days Logic Clues
+            { key: "wednesday", type: "day_clue", clue: "The day after Tuesday is ________." },
+            { key: "sunday", type: "day_clue", clue: "The day before Monday is ________." },
+            { key: "thursday", type: "day_clue", clue: "If today is Wednesday, tomorrow is ________." },
+            { key: "friday", type: "day_clue", clue: "If tomorrow is Saturday, today is ________." },
+            { key: "monday", type: "day_clue", clue: "If today is Tuesday, yesterday was ________." },
+            { key: "saturday", type: "day_clue", clue: "The day after Friday is ________." },
+            { key: "tuesday", type: "day_clue", clue: "The day before Wednesday is ________." }
+        ];
+
+        const ALL_KEYS = Object.keys(VOCAB_DATABASE);
+
+        /* ==========================================================================
+           GLOBAL GAME STATE
+           ========================================================================== */
+        let gameMode = 'full';
+        let currentPhase = 1;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let stars = 0;
+        let totalCorrect = 0;
+
+        let isListening = false;
+        let keyboardMode = false;
+        let isAudioMuted = false;
+
+        let p2CurrentLetters = [];
+        let p2FilledLetters = [];
+
+        /* ==========================================================================
+           WEB AUDIO API SYNTHESIZER
+           ========================================================================== */
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) audioCtx = new AudioContextClass();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playCorrectSound() {
+            if (isAudioMuted) return;
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            const now = ctx.currentTime;
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+                gain.gain.setValueAtTime(0.25, now + idx * 0.07);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.28);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now + idx * 0.07);
+                osc.stop(now + idx * 0.07 + 0.3);
+            });
+        }
+
+        function playIncorrectSound() {
+            if (isAudioMuted) return;
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            const now = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(220, now);
+            osc.frequency.linearRampToValueAtTime(130, now + 0.25);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.25);
+        }
+
+        function playClickSound() {
+            if (isAudioMuted) return;
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            const now = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(450, now);
+            osc.frequency.exponentialRampToValueAtTime(850, now + 0.04);
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.04);
+        }
+
+        function playVictorySound() {
+            if (isAudioMuted) return;
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            const now = ctx.currentTime;
+            const notes = [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((freq, i) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(freq, now + i * 0.12);
+                gain.gain.setValueAtTime(0.2, now + i * 0.12);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.35);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now + i * 0.12);
+                osc.stop(now + i * 0.12 + 0.4);
+            });
+        }
+
+        /* ==========================================================================
+           TEXT-TO-SPEECH (TTS)
+           ========================================================================== */
+        function speakText(text) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85;
+            utterance.pitch = 1.1;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        /* ==========================================================================
+           WEB SPEECH RECOGNITION
+           ========================================================================== */
+        let recognition = null;
+        let isSpeechSupported = false;
+
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                isSpeechSupported = true;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = function() {
+                    isListening = true;
+                    updateMicUIState(true);
+                    showStatusText("Listening for your voice...", "text-red-500");
+                };
+
+                recognition.onresult = function(event) {
+                    let interim = '';
+                    let final = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        if (event.results[i].isFinal) final += event.results[i][0].transcript;
+                        else interim += event.results[i][0].transcript;
+                    }
+                    const text = final || interim;
+                    if (text) {
+                        const transcriptElem = document.getElementById('transcriptText');
+                        transcriptElem.innerText = `"${text}"`;
+                        transcriptElem.className = "text-brand-purple font-bold";
+                    }
+                    if (final) {
+                        evaluateAnswer(final);
+                    }
+                };
+
+                recognition.onerror = function(event) {
+                    isListening = false;
+                    updateMicUIState(false);
+                    if (event.error === 'not-allowed') {
+                        showFeedback("Mic permission denied. Switched to typing mode.", false);
+                        switchToKeyboardMode(true);
+                    } else if (event.error === 'no-speech') {
+                        showFeedback("No speech heard. Please try speaking again!", false);
+                    }
+                };
+
+                recognition.onend = function() {
+                    isListening = false;
+                    updateMicUIState(false);
+                };
+            } else {
+                isSpeechSupported = false;
+                showStatusText("Speech API unavailable (Typing mode active)", "text-amber-600");
+                switchToKeyboardMode(true);
+            }
+        }
+
+        function toggleVoiceRecognition() {
+            getAudioContext();
+            playClickSound();
+
+            if (!isSpeechSupported) {
+                showFeedback("Voice Recognition not supported in browser. Please type your answer!", false);
+                switchToKeyboardMode(true);
+                return;
+            }
+
+            if (isListening) {
+                recognition.stop();
+            } else {
+                try {
+                    document.getElementById('transcriptText').innerText = "Listening... Speak clearly!";
+                    document.getElementById('transcriptText').className = "text-red-500 font-bold animate-pulse";
+                    recognition.start();
+                } catch (e) {
+                    recognition.stop();
+                }
+            }
+        }
+
+        function updateMicUIState(listening) {
+            const micBtn = document.getElementById('micBtn');
+            const micRipple = document.getElementById('micRipple');
+            const voiceWave = document.getElementById('voiceWave');
+            const micLabel = document.getElementById('micLabel');
+
+            if (listening) {
+                micBtn.classList.add('mic-active');
+                micRipple.classList.remove('hidden');
+                voiceWave.classList.remove('hidden');
+                micLabel.innerText = "LISTENING...";
+            } else {
+                micBtn.classList.remove('mic-active');
+                micRipple.classList.add('hidden');
+                voiceWave.classList.add('hidden');
+                micLabel.innerText = "TAP TO SPEAK";
+            }
+        }
+
+        function showStatusText(msg, colorClass = "text-gray-500") {
+            const elem = document.getElementById('speechStatusText');
+            elem.innerText = msg;
+            elem.className = `text-[11px] font-bold ${colorClass}`;
+        }
+
+        /* ==========================================================================
+           GAME MECHANICS & RENDER ENGINE
+           ========================================================================== */
+
+        function getQuestionListForPhase(phase) {
+            if (phase === 1 || phase === 2) {
+                return ALL_KEYS;
+            } else {
+                return PHASE_3_QUESTIONS;
+            }
+        }
+
+        function getCurrentTargetData() {
+            const list = getQuestionListForPhase(currentPhase);
+            const item = list[currentQuestionIndex];
+            if (currentPhase === 3) {
+                return {
+                    vocab: VOCAB_DATABASE[item.key],
+                    meta: item
+                };
+            } else {
+                return {
+                    vocab: VOCAB_DATABASE[item],
+                    meta: null
+                };
+            }
+        }
+
+        function renderP2Slots() {
+            const container = document.getElementById('letterSlotsContainer');
+            container.innerHTML = '';
+
+            let filledCount = 0;
+            p2CurrentLetters.forEach((char, idx) => {
+                const slot = document.createElement('div');
+                const isFilled = p2FilledLetters[idx] !== null;
+                const isNext = !isFilled && (idx === 0 || p2FilledLetters[idx - 1] !== null);
+
+                if (isFilled) {
+                    filledCount++;
+                    slot.className = "w-8 h-10 sm:w-10 sm:h-12 bg-pink-500 border-2 border-pink-600 rounded-xl flex items-center justify-center heading-font text-lg sm:text-xl font-black text-white shadow-md animate-bounce-short";
+                    slot.innerText = p2FilledLetters[idx];
+                } else if (isNext) {
+                    slot.className = "w-8 h-10 sm:w-10 sm:h-12 bg-white border-2 border-pink-500 rounded-xl flex items-center justify-center heading-font text-lg sm:text-xl font-black text-pink-400 shadow-inner animate-pulse ring-2 ring-pink-300";
+                    slot.innerText = "_";
+                } else {
+                    slot.className = "w-8 h-10 sm:w-10 sm:h-12 bg-gray-100 border-2 border-gray-300 rounded-xl flex items-center justify-center heading-font text-lg sm:text-xl font-black text-gray-400";
+                    slot.innerText = "_";
+                }
+                container.appendChild(slot);
+            });
+
+            document.getElementById('p2LetterProgress').innerText = `Spelling Progress: ${filledCount} / ${p2CurrentLetters.length} letters`;
+        }
+
+        function loadQuestion() {
+            hideFeedback();
+            document.getElementById('transcriptText').innerText = "Your spoken answer will appear here...";
+            document.getElementById('transcriptText').className = "text-gray-400 italic";
+            document.getElementById('keyboardAnswerInput').value = "";
+
+            const qList = getQuestionListForPhase(currentPhase);
+            const totalQ = qList.length;
+            const data = getCurrentTargetData();
+
+            // Progress & Badge Updates
+            document.getElementById('progressText').innerText = `Question ${currentQuestionIndex + 1} of ${totalQ}`;
+            document.getElementById('progressBar').style.width = `${((currentQuestionIndex) / totalQ) * 100}%`;
+            document.getElementById('categoryTag').innerText = data.vocab.category;
+
+            // Phase cards visibility
+            document.getElementById('phase1Card').classList.add('hidden');
+            document.getElementById('phase2Card').classList.add('hidden');
+            document.getElementById('phase3Card').classList.add('hidden');
+
+            if (currentPhase === 1) {
+                document.getElementById('phase1Card').classList.remove('hidden');
+                document.getElementById('p1Emoji').innerText = data.vocab.logo;
+                document.getElementById('p1TargetWord').innerText = data.vocab.word;
+                document.getElementById('p1Phonetic').innerText = `Phonics: ${data.vocab.phonetic}`;
+
+                document.getElementById('phaseBadgeText').innerText = "Phase 1: Word Pronunciation";
+                document.getElementById('phaseBadge').className = "bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-3.5 py-1 rounded-full font-bold text-xs shadow-md flex items-center space-x-1.5";
+            }
+            else if (currentPhase === 2) {
+                document.getElementById('phase2Card').classList.remove('hidden');
+                
+                // Prominent Logo Display
+                document.getElementById('p2Logo').innerText = data.vocab.logo;
+                document.getElementById('p2VocabName').innerText = data.vocab.word;
+
+                // Setup Phase 2 letter tracking & slots
+                const cleanLetters = data.vocab.word.replace(/[^a-zA-Z]/g, '').toUpperCase();
+                p2CurrentLetters = cleanLetters.split('');
+                p2FilledLetters = new Array(p2CurrentLetters.length).fill(null);
+                
+                renderP2Slots();
+
+                document.getElementById('phaseBadgeText').innerText = "Phase 2: Spelling Per Huruf";
+                document.getElementById('phaseBadge').className = "bg-gradient-to-r from-pink-500 to-rose-600 text-white px-3.5 py-1 rounded-full font-bold text-xs shadow-md flex items-center space-x-1.5";
+            }
+            else if (currentPhase === 3) {
+                document.getElementById('phase3Card').classList.remove('hidden');
+                document.getElementById('p3SubjectView').classList.add('hidden');
+                document.getElementById('p3DaysView').classList.add('hidden');
+
+                if (data.meta.type === 'subject_logo') {
+                    // SHOW ONLY LOGO - NO TEXT DESCRIPTION
+                    document.getElementById('p3SubjectView').classList.remove('hidden');
+                    document.getElementById('p3SubjectLogo').innerText = data.vocab.logo;
+                } else {
+                    // Days logic clue
+                    document.getElementById('p3DaysView').classList.remove('hidden');
+                    document.getElementById('p3DayEmoji').innerText = data.vocab.logo;
+                    document.getElementById('p3DayClueText').innerText = data.meta.clue;
+                }
+
+                document.getElementById('phaseBadgeText').innerText = "Phase 3: Clues & Logos";
+                document.getElementById('phaseBadge').className = "bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3.5 py-1 rounded-full font-bold text-xs shadow-md flex items-center space-x-1.5";
+            }
+        }
+
+        function normalizeString(str) {
+            return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+        }
+
+        function parseSpokenLetters(text) {
+            const phoneticMap = {
+                'a': 'A', 'ey': 'A', 'ay': 'A',
+                'b': 'B', 'be': 'B', 'bee': 'B',
+                'c': 'C', 'see': 'C', 'sea': 'C',
+                'd': 'D', 'dee': 'D',
+                'e': 'E',
+                'f': 'F', 'ef': 'F',
+                'g': 'G', 'gee': 'G',
+                'h': 'H', 'aitch': 'H', 'each': 'H',
+                'i': 'I', 'eye': 'I',
+                'j': 'J', 'jay': 'J',
+                'k': 'K', 'kay': 'K',
+                'l': 'L', 'el': 'L',
+                'm': 'M', 'em': 'M',
+                'n': 'N', 'en': 'N',
+                'o': 'O', 'oh': 'O',
+                'p': 'P', 'pee': 'P',
+                'q': 'Q', 'cue': 'Q',
+                'r': 'R', 'ar': 'R', 'are': 'R',
+                's': 'S', 'es': 'S',
+                't': 'T', 'tee': 'T', 'tea': 'T',
+                'u': 'U', 'you': 'U',
+                'v': 'V', 'vee': 'V',
+                'w': 'W', 'doubleu': 'W',
+                'x': 'X', 'ex': 'X',
+                'y': 'Y', 'why': 'Y',
+                'z': 'Z', 'zee': 'Z', 'zed': 'Z'
+            };
+
+            const tokens = text.toLowerCase().trim().split(/[\s\-\,]+/);
+            const result = [];
+
+            tokens.forEach(tok => {
+                const cleanTok = tok.replace(/[^a-z]/g, '');
+                if (phoneticMap[cleanTok]) {
+                    result.push(phoneticMap[cleanTok]);
+                } else if (cleanTok.length === 1) {
+                    result.push(cleanTok.toUpperCase());
+                } else {
+                    for (let c of cleanTok) {
+                        result.push(c.toUpperCase());
+                    }
+                }
+            });
+
+            return result;
+        }
+
+        function evaluateAnswer(userInput) {
+            const data = getCurrentTargetData();
+            const targetWordClean = normalizeString(data.vocab.word);
+            const userClean = normalizeString(userInput);
+
+            if (currentPhase === 1 || currentPhase === 3) {
+                let isCorrect = false;
+
+                if (userClean === targetWordClean || userClean.includes(targetWordClean)) {
+                    isCorrect = true;
+                }
+
+                if (!isCorrect && data.vocab.word === "Physical Education") {
+                    if (userClean === "pe" || userClean.includes("physicaleducation") || userClean === "sports") {
+                        isCorrect = true;
+                    }
+                }
+
+                if (isCorrect) {
+                    handleCorrectAnswer();
+                } else {
+                    handleIncorrectAnswer(userInput);
+                }
+            } 
+            else if (currentPhase === 2) {
+                let isCorrect = false;
+
+                if (userClean === targetWordClean || userClean.includes(targetWordClean)) {
+                    isCorrect = true;
+                } else if (data.vocab.word === "Physical Education" && (userClean === "pe" || userClean === "sports")) {
+                    isCorrect = true;
+                }
+
+                if (isCorrect) {
+                    p2FilledLetters = [...p2CurrentLetters];
+                    renderP2Slots();
+                    handleCorrectAnswer();
+                    return;
+                }
+
+                const spokenLetters = parseSpokenLetters(userInput);
+                let newlyFilled = 0;
+
+                spokenLetters.forEach(char => {
+                    const nextEmptyIdx = p2FilledLetters.findIndex(val => val === null);
+                    if (nextEmptyIdx !== -1) {
+                        if (char.toUpperCase() === p2CurrentLetters[nextEmptyIdx]) {
+                            p2FilledLetters[nextEmptyIdx] = char.toUpperCase();
+                            newlyFilled++;
+                        }
+                    }
+                });
+
+                renderP2Slots();
+
+                const allSlotsFilled = p2FilledLetters.every(val => val !== null);
+
+                if (allSlotsFilled) {
+                    const filledString = p2FilledLetters.join('').toLowerCase();
+                    if (filledString === targetWordClean) {
+                        handleCorrectAnswer();
+                    } else {
+                        handleIncorrectAnswer(userInput);
+                    }
+                } else if (newlyFilled > 0) {
+                    playClickSound();
+                    const filledCount = p2FilledLetters.filter(v => v !== null).length;
+                    showFeedback(`Letter added! (${filledCount}/${p2CurrentLetters.length} filled). Keep spelling!`, true);
+                } else {
+                    handleIncorrectAnswer(userInput);
+                }
+            }
+        }
+
+        function handleCorrectAnswer() {
+            playCorrectSound();
+            triggerConfetti();
+            
+            score += 10;
+            stars += 1;
+            totalCorrect += 1;
+
+            document.getElementById('scoreCounter').innerText = score;
+            document.getElementById('starCounter').innerText = stars;
+
+            showFeedback("SUPERB! Perfect Spelling! ⭐", true);
+
+            setTimeout(() => {
+                advanceQuestion();
+            }, 1200);
+        }
+
+        function handleIncorrectAnswer(userSpeech) {
+            playIncorrectSound();
+            const data = getCurrentTargetData();
+            showFeedback(`Not quite: "${userSpeech}". Try saying "${data.vocab.word}"!`, false);
+        }
+
+        function advanceQuestion() {
+            const qList = getQuestionListForPhase(currentPhase);
+            if (currentQuestionIndex < qList.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                // Phase complete logic
+                if (gameMode === 'full' && currentPhase < 3) {
+                    showPhaseModal();
+                } else {
+                    showGameOverScreen();
+                }
+            }
+        }
+
+        function showPhaseModal() {
+            playVictorySound();
+            triggerConfetti();
+            document.getElementById('phaseModal').classList.remove('hidden');
+            document.getElementById('phaseModalText').innerText = `Awesome job completing Phase ${currentPhase}! Ready for Phase ${currentPhase + 1}?`;
+        }
+
+        function nextPhaseFromModal() {
+            playClickSound();
+            document.getElementById('phaseModal').classList.add('hidden');
+            currentPhase++;
+            currentQuestionIndex = 0;
+            loadQuestion();
+        }
+
+        function showGameOverScreen() {
+            playVictorySound();
+            triggerConfetti();
+
+            document.getElementById('gameOverScreen').classList.remove('hidden');
+            document.getElementById('finalScoreText').innerText = `${score} pts`;
+            document.getElementById('finalAccuracyText').innerText = `${totalCorrect} Correct`;
+            document.getElementById('finalStarsText').innerText = `${stars} Stars ⭐`;
+
+            const starsContainer = document.getElementById('starsContainer');
+            starsContainer.innerHTML = `
+                <i class="fa-solid fa-star text-yellow-400 animate-bounce"></i>
+                <i class="fa-solid fa-star text-yellow-400 animate-bounce" style="animation-delay: 0.15s"></i>
+                <i class="fa-solid fa-star text-yellow-400 animate-bounce" style="animation-delay: 0.3s"></i>
+            `;
+        }
+
+        function startSpecificPhase(phaseNum, mode = 'single') {
+            getAudioContext();
+            playClickSound();
+            gameMode = mode;
+            currentPhase = phaseNum;
+            currentQuestionIndex = 0;
+            
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            document.getElementById('phaseModal').classList.add('hidden');
+            
+            loadQuestion();
+        }
+
+        function resetToMainMenu() {
+            playClickSound();
+            score = 0;
+            stars = 0;
+            totalCorrect = 0;
+            document.getElementById('scoreCounter').innerText = '0';
+            document.getElementById('starCounter').innerText = '0';
+
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            document.getElementById('phaseModal').classList.add('hidden');
+        }
+
+        function speakTargetWord() {
+            playClickSound();
+            const data = getCurrentTargetData();
+            speakText(data.vocab.word);
+        }
+
+        function showHint() {
+            playClickSound();
+            const data = getCurrentTargetData();
+            showFeedback(`Hint: ${data.vocab.hint}`, false);
+            speakText(data.vocab.hint);
+        }
+
+        function skipQuestion() {
+            playClickSound();
+            advanceQuestion();
+        }
+
+        function submitKeyboardAnswer() {
+            const val = document.getElementById('keyboardAnswerInput').value;
+            if (val.trim()) evaluateAnswer(val);
+        }
+
+        function toggleSound() {
+            isAudioMuted = !isAudioMuted;
+            document.getElementById('soundIcon').className = isAudioMuted 
+                ? "fa-solid fa-volume-xmark text-sm text-red-500" 
+                : "fa-solid fa-volume-high text-sm text-gray-600";
+        }
+
+        function showFeedback(msg, isSuccess = true) {
+            const toast = document.getElementById('feedbackToast');
+            document.getElementById('feedbackText').innerText = msg;
+            if (isSuccess) {
+                document.getElementById('feedbackIcon').innerText = "✨";
+                toast.className = "opacity-100 transition-opacity duration-300 mb-2 px-4 py-1 rounded-2xl text-xs sm:text-sm font-extrabold flex items-center space-x-2 shadow-sm bg-emerald-100 text-emerald-800 border border-emerald-300 animate-bounce-short";
+            } else {
+                document.getElementById('feedbackIcon').innerText = "💡";
+                toast.className = "opacity-100 transition-opacity duration-300 mb-2 px-4 py-1 rounded-2xl text-xs sm:text-sm font-extrabold flex items-center space-x-2 shadow-sm bg-amber-100 text-amber-800 border border-amber-300";
+            }
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedbackToast').classList.add('opacity-0');
+        }
+
+        function switchToKeyboardMode(forceEnable = false) {
+            keyboardMode = forceEnable ? true : !keyboardMode;
+            const voiceArea = document.getElementById('voiceControlArea');
+            const textInputArea = document.getElementById('textInputArea');
+            const toggleText = document.getElementById('toggleInputText');
+
+            if (keyboardMode) {
+                voiceArea.classList.add('hidden');
+                textInputArea.classList.remove('hidden');
+                toggleText.innerText = "Switch to Voice Microphone Mode 🎙️";
+            } else {
+                voiceArea.classList.remove('hidden');
+                textInputArea.classList.add('hidden');
+                toggleText.innerText = "Can't use mic? Switch to Typing Mode ⌨️";
+            }
+        }
+
+        // Canvas Confetti Effect
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function triggerConfetti() {
+            particles = [];
+            const colors = ['#6C5CE7', '#FD79A8', '#FDCB6E', '#74B9FF', '#55E6C1', '#FF7675'];
+            for (let i = 0; i < 60; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: (Math.random() - 0.7) * 14,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 8 + 4,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: (Math.random() - 0.5) * 10,
+                    life: 1
+                });
+            }
+            animateConfetti();
+        }
+
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, index) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.3;
+                p.rotation += p.rotationSpeed;
+                p.life -= 0.015;
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate((p.rotation * Math.PI) / 180);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = Math.max(0, p.life);
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                ctx.restore();
+
+                if (p.life <= 0) particles.splice(index, 1);
+            });
+            if (particles.length > 0) requestAnimationFrame(animateConfetti);
+        }
+
+        // EXPOSE GLOBAL WINDOW HANDLERS FOR INLINE HTML CLICK HANDLERS
+        window.startSpecificPhase = startSpecificPhase;
+        window.resetToMainMenu = resetToMainMenu;
+        window.nextPhaseFromModal = nextPhaseFromModal;
+        window.toggleVoiceRecognition = toggleVoiceRecognition;
+        window.speakTargetWord = speakTargetWord;
+        window.showHint = showHint;
+        window.skipQuestion = skipQuestion;
+        window.submitKeyboardAnswer = submitKeyboardAnswer;
+        window.switchToKeyboardMode = switchToKeyboardMode;
+        window.toggleSound = toggleSound;
+
+        /* INITIALIZE SPEECH ENGINE ON DOM LOAD */
+        document.addEventListener('DOMContentLoaded', () => {
+            initSpeechRecognition();
+        });
+    </script>
+</body>
+</html>
